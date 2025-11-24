@@ -174,5 +174,3 @@ Cukup build project dan upload folder `dist/` ke hosting pilihan.
 MIT License - silakan gunakan untuk project personal maupun komersial.
 
 ---
-
-Dikembangkan dengan fokus pada UX dan performa optimal.
