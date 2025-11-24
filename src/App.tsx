@@ -9,6 +9,8 @@ interface Template {
   useDot: boolean;
   useUppercase: boolean;
   useLowercase: boolean;
+  useDomainUppercase: boolean;
+  useDomainLowercase: boolean;
 }
 
 function App() {
@@ -26,6 +28,8 @@ function App() {
   const [useDot, setUseDot] = useState(false);
   const [useUppercase, setUseUppercase] = useState(false);
   const [useLowercase, setUseLowercase] = useState(false);
+  const [useDomainUppercase, setUseDomainUppercase] = useState(false);
+  const [useDomainLowercase, setUseDomainLowercase] = useState(false);
 
   const [history, setHistory] = useState<string[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -119,13 +123,28 @@ function App() {
     return result;
   };
 
+  const applyDomainTricks = (domainName: string): string => {
+    let result = domainName;
+
+    if (useDomainUppercase && useDomainLowercase) {
+      result = randomizeCase(result);
+    } else if (useDomainUppercase) {
+      result = result.toUpperCase();
+    } else if (useDomainLowercase) {
+      result = result.toLowerCase();
+    }
+
+    return result;
+  };
+
   const generateSingleEmail = () => {
     if (!baseInput.trim()) return;
 
     setEmailError('');
     const username = baseInput.split('@')[0] || baseInput;
     const processedUsername = applyTricks(username, counter);
-    const newEmail = `${processedUsername}@${domain}`;
+    const processedDomain = applyDomainTricks(domain);
+    const newEmail = `${processedUsername}@${processedDomain}`;
 
     if (!validateEmail(newEmail)) {
       setEmailError('Format email tidak valid');
@@ -151,7 +170,8 @@ function App() {
     for (let i = 0; i < bulkCount; i++) {
       const num = bulkStart + i;
       const processedUsername = applyTricks(username, num);
-      const email = `${processedUsername}@${domain}`;
+      const processedDomain = applyDomainTricks(domain);
+      const email = `${processedUsername}@${processedDomain}`;
 
       if (!validateEmail(email)) {
         setEmailError('Format email tidak valid');
@@ -176,7 +196,8 @@ function App() {
     for (let i = 0; i < previewCount; i++) {
       const num = bulkStart + i;
       const processedUsername = applyTricks(username, num);
-      const email = `${processedUsername}@${domain}`;
+      const processedDomain = applyDomainTricks(domain);
+      const email = `${processedUsername}@${processedDomain}`;
 
       if (!validateEmail(email)) {
         setEmailError('Format email tidak valid');
@@ -223,6 +244,8 @@ function App() {
       useDot,
       useUppercase,
       useLowercase,
+      useDomainUppercase,
+      useDomainLowercase,
     };
 
     const updatedTemplates = [...templates, newTemplate];
@@ -237,6 +260,8 @@ function App() {
     setUseDot(template.useDot);
     setUseUppercase(template.useUppercase);
     setUseLowercase(template.useLowercase);
+    setUseDomainUppercase(template.useDomainUppercase || false);
+    setUseDomainLowercase(template.useDomainLowercase || false);
   };
 
   const deleteTemplate = (index: number) => {
@@ -256,7 +281,7 @@ function App() {
     }
   };
 
-  const toggleTrick = (trick: 'plus' | 'dot' | 'uppercase' | 'lowercase') => {
+  const toggleTrick = (trick: 'plus' | 'dot' | 'uppercase' | 'lowercase' | 'domainUppercase' | 'domainLowercase') => {
     switch (trick) {
       case 'plus':
         setUsePlus(!usePlus);
@@ -269,6 +294,12 @@ function App() {
         break;
       case 'lowercase':
         setUseLowercase(!useLowercase);
+        break;
+      case 'domainUppercase':
+        setUseDomainUppercase(!useDomainUppercase);
+        break;
+      case 'domainLowercase':
+        setUseDomainLowercase(!useDomainLowercase);
         break;
     }
   };
@@ -341,8 +372,13 @@ function App() {
                     <p className={`text-xs italic ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Gmail anggap semua sama</p>
                   </div>
                   <div>
-                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>UPPERCASE / lowercase</p>
+                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>UPPERCASE / lowercase (Username)</p>
                     <p className="text-xs">Ubah huruf besar/kecil di username</p>
+                  </div>
+                  <div>
+                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>UPPERCASE / lowercase (Domain)</p>
+                    <p className="text-xs">Ubah huruf besar/kecil di domain (setelah @)</p>
+                    <p className="text-xs">Contoh: namaanda@GMAIL.COM atau namaanda@GmAiL.cOm</p>
                   </div>
                 </div>
               </div>
@@ -593,49 +629,80 @@ function App() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => toggleTrick('plus')}
-                className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  usePlus
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                }`}
-              >
-                Plus (+)
-              </button>
-              <button
-                onClick={() => toggleTrick('dot')}
-                className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  useDot
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                }`}
-              >
-                Titik (.)
-              </button>
-              <button
-                onClick={() => toggleTrick('uppercase')}
-                className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  useUppercase
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                }`}
-              >
-                UPPERCASE
-              </button>
-              <button
-                onClick={() => toggleTrick('lowercase')}
-                className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  useLowercase
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                }`}
-              >
-                lowercase
-              </button>
+            <div className="space-y-3">
+              <div>
+                <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Metode Username:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => toggleTrick('plus')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      usePlus
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    Plus (+)
+                  </button>
+                  <button
+                    onClick={() => toggleTrick('dot')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useDot
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    Titik (.)
+                  </button>
+                  <button
+                    onClick={() => toggleTrick('uppercase')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useUppercase
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    UPPERCASE
+                  </button>
+                  <button
+                    onClick={() => toggleTrick('lowercase')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useLowercase
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    lowercase
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Metode Domain (setelah @):</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => toggleTrick('domainUppercase')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useDomainUppercase
+                        ? 'bg-green-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    UPPERCASE
+                  </button>
+                  <button
+                    onClick={() => toggleTrick('domainLowercase')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useDomainLowercase
+                        ? 'bg-green-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    lowercase
+                  </button>
+                </div>
+              </div>
             </div>
-            <p className={`text-xs mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu.</p>
+            <p className={`text-xs mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu di setiap bagian.</p>
           </div>
 
           {mode === 'single' ? (

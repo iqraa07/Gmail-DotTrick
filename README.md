@@ -25,9 +25,11 @@ Buat ratusan hingga jutaan email sekaligus dengan kontrol penuh:
 
 ## Metode Email
 
-Generator ini menyediakan 4 metode yang bisa dikombinasikan sesuai kebutuhan:
+Generator ini menyediakan berbagai metode yang bisa dikombinasikan sesuai kebutuhan:
 
-### 1. Plus Method (+)
+### Metode Username
+
+#### 1. Plus Method (+)
 Menambahkan suffix numerik setelah tanda plus.
 ```
 contoh+1@gmail.com
@@ -36,7 +38,7 @@ contoh+3@gmail.com
 ```
 Semua email dengan plus masuk ke inbox yang sama (`contoh@gmail.com`).
 
-### 2. Dot Method (.)
+#### 2. Dot Method (.)
 Menyisipkan titik secara random pada username.
 ```
 con.toh@gmail.com
@@ -45,14 +47,28 @@ co.nt.oh@gmail.com
 ```
 Gmail memperlakukan semua variasi titik sebagai alamat yang identik.
 
-### 3. Uppercase
-Mengubah karakter menjadi huruf kapital.
+#### 3. Uppercase (Username)
+Mengubah karakter username menjadi huruf kapital.
 ```
 CONTOH@gmail.com
 ```
 
-### 4. Lowercase
-Mengubah karakter menjadi huruf kecil.
+#### 4. Lowercase (Username)
+Mengubah karakter username menjadi huruf kecil.
+```
+contoh@gmail.com
+```
+
+### Metode Domain
+
+#### 5. Uppercase (Domain)
+Mengubah domain (setelah @) menjadi huruf kapital.
+```
+contoh@GMAIL.COM
+```
+
+#### 6. Lowercase (Domain)
+Mengubah domain (setelah @) menjadi huruf kecil.
 ```
 contoh@gmail.com
 ```
@@ -60,9 +76,11 @@ contoh@gmail.com
 ### Kombinasi Metode
 Gabungkan beberapa metode untuk variasi maksimal:
 - `Plus + Dot`: `con.toh+1@gmail.com`
-- `Plus + Uppercase`: `CONTOH+1@gmail.com`
-- `Uppercase + Lowercase`: `CoNtOh@gmail.com` (random case)
-- `Plus + Dot + Uppercase`: `CON.TOH+1@gmail.com`
+- `Plus + Uppercase (Username)`: `CONTOH+1@gmail.com`
+- `Plus + Uppercase (Domain)`: `contoh+1@GMAIL.COM`
+- `Uppercase (Username) + Lowercase (Username)`: `CoNtOh@gmail.com` (random case username)
+- `Uppercase (Domain) + Lowercase (Domain)`: `contoh@GmAiL.cOm` (random case domain)
+- `Plus + Dot + Uppercase (Username) + Uppercase (Domain)`: `CON.TOH+1@GMAIL.COM`
 
 ## Cara Penggunaan
 
@@ -151,26 +169,6 @@ npm run lint
 - **State Management**: React Hooks (useState, useEffect)
 - **Storage**: Browser localStorage API
 
-## Deployment
-
-Aplikasi ini adalah static site dan bisa dideploy di berbagai platform:
-- Vercel (recommended)
-- Netlify
-- GitHub Pages
-- Cloudflare Pages
-- Firebase Hosting
-
-Cukup build project dan upload folder `dist/` ke hosting pilihan.
-
-## Browser Support
-
-- Chrome/Edge (latest)
-- Firefox (latest)
-- Safari (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
 ## License
 
 MIT License - silakan gunakan untuk project personal maupun komersial.
-
----
