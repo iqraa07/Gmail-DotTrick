@@ -9,8 +9,7 @@ interface Template {
   useDot: boolean;
   useUppercase: boolean;
   useLowercase: boolean;
-  useDomainUppercase: boolean;
-  useDomainLowercase: boolean;
+  useDomainRandom: boolean;
 }
 
 function App() {
@@ -28,8 +27,7 @@ function App() {
   const [useDot, setUseDot] = useState(false);
   const [useUppercase, setUseUppercase] = useState(false);
   const [useLowercase, setUseLowercase] = useState(false);
-  const [useDomainUppercase, setUseDomainUppercase] = useState(false);
-  const [useDomainLowercase, setUseDomainLowercase] = useState(false);
+  const [useDomainRandom, setUseDomainRandom] = useState(false);
 
   const [history, setHistory] = useState<string[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -126,12 +124,8 @@ function App() {
   const applyDomainTricks = (domainName: string): string => {
     let result = domainName;
 
-    if (useDomainUppercase && useDomainLowercase) {
+    if (useDomainRandom) {
       result = randomizeCase(result);
-    } else if (useDomainUppercase) {
-      result = result.toUpperCase();
-    } else if (useDomainLowercase) {
-      result = result.toLowerCase();
     }
 
     return result;
@@ -244,8 +238,7 @@ function App() {
       useDot,
       useUppercase,
       useLowercase,
-      useDomainUppercase,
-      useDomainLowercase,
+      useDomainRandom,
     };
 
     const updatedTemplates = [...templates, newTemplate];
@@ -260,8 +253,7 @@ function App() {
     setUseDot(template.useDot);
     setUseUppercase(template.useUppercase);
     setUseLowercase(template.useLowercase);
-    setUseDomainUppercase(template.useDomainUppercase || false);
-    setUseDomainLowercase(template.useDomainLowercase || false);
+    setUseDomainRandom(template.useDomainRandom || false);
   };
 
   const deleteTemplate = (index: number) => {
@@ -281,7 +273,7 @@ function App() {
     }
   };
 
-  const toggleTrick = (trick: 'plus' | 'dot' | 'uppercase' | 'lowercase' | 'domainUppercase' | 'domainLowercase') => {
+  const toggleTrick = (trick: 'plus' | 'dot' | 'uppercase' | 'lowercase' | 'domainRandom') => {
     switch (trick) {
       case 'plus':
         setUsePlus(!usePlus);
@@ -295,11 +287,8 @@ function App() {
       case 'lowercase':
         setUseLowercase(!useLowercase);
         break;
-      case 'domainUppercase':
-        setUseDomainUppercase(!useDomainUppercase);
-        break;
-      case 'domainLowercase':
-        setUseDomainLowercase(!useDomainLowercase);
+      case 'domainRandom':
+        setUseDomainRandom(!useDomainRandom);
         break;
     }
   };
@@ -376,9 +365,9 @@ function App() {
                     <p className="text-xs">Ubah huruf besar/kecil di username</p>
                   </div>
                   <div>
-                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>UPPERCASE / lowercase (Domain)</p>
-                    <p className="text-xs">Ubah huruf besar/kecil di domain (setelah @)</p>
-                    <p className="text-xs">Contoh: namaanda@GMAIL.COM atau namaanda@GmAiL.cOm</p>
+                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>Random Case (Domain)</p>
+                    <p className="text-xs">Random huruf besar/kecil di domain (setelah @)</p>
+                    <p className="text-xs">Contoh: namaanda@GmAiL.cOm atau namaanda@gMAIl.Com</p>
                   </div>
                 </div>
               </div>
@@ -678,26 +667,16 @@ function App() {
 
               <div>
                 <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Metode Domain (setelah @):</p>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 gap-2">
                   <button
-                    onClick={() => toggleTrick('domainUppercase')}
+                    onClick={() => toggleTrick('domainRandom')}
                     className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                      useDomainUppercase
+                      useDomainRandom
                         ? 'bg-green-600 text-white shadow-md'
                         : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
                     }`}
                   >
-                    UPPERCASE
-                  </button>
-                  <button
-                    onClick={() => toggleTrick('domainLowercase')}
-                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                      useDomainLowercase
-                        ? 'bg-green-600 text-white shadow-md'
-                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                    }`}
-                  >
-                    lowercase
+                    Random Case (gMaIl.CoM)
                   </button>
                 </div>
               </div>

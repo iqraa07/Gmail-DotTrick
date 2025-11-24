@@ -61,26 +61,22 @@ contoh@gmail.com
 
 ### Metode Domain
 
-#### 5. Uppercase (Domain)
-Mengubah domain (setelah @) menjadi huruf kapital.
+#### 5. Random Case (Domain)
+Mengubah domain (setelah @) dengan kombinasi huruf besar dan kecil secara random.
 ```
-contoh@GMAIL.COM
-```
-
-#### 6. Lowercase (Domain)
-Mengubah domain (setelah @) menjadi huruf kecil.
-```
-contoh@gmail.com
+contoh@GmAiL.cOm
+contoh@gMAIl.Com
+contoh@GMail.COM
 ```
 
 ### Kombinasi Metode
 Gabungkan beberapa metode untuk variasi maksimal:
 - `Plus + Dot`: `con.toh+1@gmail.com`
 - `Plus + Uppercase (Username)`: `CONTOH+1@gmail.com`
-- `Plus + Uppercase (Domain)`: `contoh+1@GMAIL.COM`
+- `Plus + Random Case (Domain)`: `contoh+1@GmAiL.cOm`
 - `Uppercase (Username) + Lowercase (Username)`: `CoNtOh@gmail.com` (random case username)
-- `Uppercase (Domain) + Lowercase (Domain)`: `contoh@GmAiL.cOm` (random case domain)
-- `Plus + Dot + Uppercase (Username) + Uppercase (Domain)`: `CON.TOH+1@GMAIL.COM`
+- `Dot + Random Case (Domain)`: `con.toh@gMAIl.Com`
+- `Plus + Dot + Uppercase (Username) + Random Case (Domain)`: `CON.TOH+1@GmAiL.cOm`
 
 ## Cara Penggunaan
 
