@@ -676,7 +676,7 @@ function App() {
                         : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
                     }`}
                   >
-                    Random Case (gMaIl.CoM)
+                    Random Case (Uppercase + Lowercase)
                   </button>
                 </div>
               </div>
