@@ -1,170 +1,97 @@
 # Email Generator
 
-Tool berbasis web untuk membuat varian email menggunakan berbagai metode. Berguna untuk testing aplikasi, managing multiple accounts, atau kebutuhan development lainnya. Interface responsif yang bekerja sempurna di semua perangkat.
+Website untuk membuat varian email dengan berbagai metode. Cocok untuk testing, registrasi multiple account, atau keperluan lainnya. Responsif untuk semua device (HP, tablet, PC).
 
-## Daftar Isi
+## Fitur
 
-- [Fitur Utama](#fitur-utama)
-- [Metode Email](#metode-email)
-- [Cara Penggunaan](#cara-penggunaan)
-- [Fitur Tambahan](#fitur-tambahan)
-- [Setup & Development](#setup--development)
-- [Tech Stack](#tech-stack)
+### Mode Satu
+Buat satu email sekaligus dan langsung tersalin otomatis ke clipboard. Cocok untuk daftar akun dengan cepat.
 
-## Fitur Utama
+### Mode Banyak
+Generate banyak email sekaligus (default 100 email). Bisa setting:
+- Mulai dari nomor berapa
+- Mau berapa banyak (max 1 juta email)
 
-### Mode Single
-Generate satu email dan otomatis tersalin ke clipboard. Ideal untuk registrasi cepat atau testing sederhana.
+### Empat Metode (Bisa Digabung!)
 
-### Mode Bulk
-Buat ratusan hingga jutaan email sekaligus dengan kontrol penuh:
-- Tentukan nomor awal (start number)
-- Atur jumlah email yang ingin dibuat (hingga 1 juta)
-- Preview 5 email pertama sebelum generate semua
-- Download hasil dalam format .txt
+#### Metode Plus (+)
+Format: `username+1@gmail.com`, `username+2@gmail.com`, dst.
 
-## Metode Email
+Semua email dengan trik plus akan masuk ke inbox yang sama. Jadi `testing+1@gmail.com` dan `testing+2@gmail.com` akan masuk ke `testing@gmail.com`.
 
-Generator ini menyediakan berbagai metode yang bisa dikombinasikan sesuai kebutuhan:
+#### Metode Titik (.)
+Format: `user.name@gmail.com`, `u.sername@gmail.com`, `us.er.name@gmail.com`
 
-### Metode Username
+Titik akan diacak secara random di username. Gmail anggap semua variasi titik sebagai email yang sama. Jadi `username@gmail.com`, `user.name@gmail.com`, dan `u.s.e.r.name@gmail.com` akan masuk ke inbox yang sama.
 
-#### 1. Plus Method (+)
-Menambahkan suffix numerik setelah tanda plus.
-```
-contoh+1@gmail.com
-contoh+2@gmail.com
-contoh+3@gmail.com
-```
-Semua email dengan plus masuk ke inbox yang sama (`contoh@gmail.com`).
+#### Uppercase
+Ubah semua huruf jadi KAPITAL. Contoh: `USERNAME@gmail.com`
 
-#### 2. Dot Method (.)
-Menyisipkan titik secara random pada username.
-```
-con.toh@gmail.com
-c.ontoh@gmail.com
-co.nt.oh@gmail.com
-```
-Gmail memperlakukan semua variasi titik sebagai alamat yang identik.
+#### Lowercase
+Ubah semua huruf jadi kecil. Contoh: `username@gmail.com`
 
-#### 3. Uppercase (Username)
-Mengubah karakter username menjadi huruf kapital.
-```
-CONTOH@gmail.com
-```
-
-#### 4. Lowercase (Username)
-Mengubah karakter username menjadi huruf kecil.
-```
-contoh@gmail.com
-```
-
-### Metode Domain
-
-#### 5. Random Case (Domain)
-Mengubah domain (setelah @) dengan kombinasi huruf besar dan kecil secara random.
-```
-contoh@GmAiL.cOm
-contoh@gMAIl.Com
-contoh@GMail.COM
-```
-
-### Kombinasi Metode
-Gabungkan beberapa metode untuk variasi maksimal:
-- `Plus + Dot`: `con.toh+1@gmail.com`
-- `Plus + Uppercase (Username)`: `CONTOH+1@gmail.com`
-- `Plus + Random Case (Domain)`: `contoh+1@GmAiL.cOm`
-- `Uppercase (Username) + Lowercase (Username)`: `CoNtOh@gmail.com` (random case username)
-- `Dot + Random Case (Domain)`: `con.toh@gMAIl.Com`
-- `Plus + Dot + Uppercase (Username) + Random Case (Domain)`: `CON.TOH+1@GmAiL.cOm`
-
-## Cara Penggunaan
-
-### Langkah Dasar
-1. Input username tanpa domain (contoh: `johndoe`)
-2. Pilih domain email (default: `gmail.com`)
-3. Aktifkan metode yang diinginkan dengan klik checkbox
-4. Pilih mode Single atau Bulk
-5. Klik tombol Generate
-
-### Mode Bulk Detail
-1. Set nomor awal di field "Mulai dari Nomor"
-2. Tentukan jumlah email di field "Jumlah Email"
-3. (Opsional) Klik "Preview" untuk melihat 5 email pertama
-4. Klik "Buat" untuk generate semua email
-5. Gunakan tombol "Salin" untuk copy ke clipboard atau "Download" untuk save sebagai file
-
-### Tips
-- Gunakan tombol "Reset Counter" untuk mengulang nomor urut dari 1
-- History menyimpan semua email yang pernah dibuat (tersimpan di browser)
-- Template memungkinkan save kombinasi metode favorit untuk digunakan kembali
+### Gabungan Metode
+Kamu bisa aktifkan beberapa metode sekaligus! Contoh kombinasi:
+- **Plus + Dot**: `user.name+1@gmail.com`
+- **Plus + Uppercase**: `USERNAME+1@gmail.com`
+- **Dot + Lowercase**: `user.name@gmail.com`
+- **Plus + Dot + Uppercase**: `USER.NAME+1@gmail.com`
+- **Uppercase + Lowercase**: `UsErNaMe@gmail.com` (random case tiap huruf)
 
 ## Fitur Tambahan
 
-### History Management
-- Menyimpan seluruh riwayat email yang dibuat
-- Data tersimpan di localStorage browser
-- Bisa dihapus kapan saja dengan tombol "Hapus Semua"
-- Toggle visibility dengan tombol History di header
+### Download Bulk Email
+Di mode banyak, hasil email bisa didownload jadi file `.txt`. Cocok untuk disimpan atau diimport ke aplikasi lain.
 
-### Template System
-Simpan kombinasi metode favorit:
-1. Pilih kombinasi metode yang diinginkan
-2. Klik "Simpan Template"
-3. Beri nama template
-4. Load template dengan klik nama yang tersimpan
-5. Hapus template dengan klik icon X
+### Reset Counter
+Kalau pakai metode Plus, nomor urut otomatis bertambah tiap generate. Klik tombol Reset untuk mulai lagi dari 1.
 
-**Catatan**: Template tersimpan di localStorage browser. Data akan hilang jika clear browser data, menggunakan mode incognito, atau berganti browser/device.
+## Cara Pakai
 
-### Dark Mode
-Interface otomatis menyesuaikan dengan preferensi tema. Toggle manual tersedia di header dengan icon sun/moon. Preferensi tersimpan otomatis.
+1. **Masukkan Username** - Isi username email (tanpa @gmail.com)
+2. **Pilih Domain** - Default gmail.com, bisa diganti sesuai kebutuhan
+3. **Pilih Metode** - Klik tombol metode yang mau dipakai (bisa lebih dari satu)
+4. **Pilih Mode** - Satu atau Banyak
+5. **Klik Generate** - Email langsung dibuat dan tersalin otomatis
 
-### Validasi Email
-Sistem otomatis memvalidasi format email sebelum proses generate. Error message akan muncul jika format tidak valid.
+### Mode Banyak
+Kalau pakai mode banyak:
+1. Isi **Mulai dari Nomor** - Misalnya mulai dari 1
+2. Isi **Jumlah Email** - Mau bikin berapa email (default 100)
+3. Klik **Buat** - Semua email langsung muncul
+4. Klik **Salin** - Copy semua email sekaligus
+5. Atau klik **Download** - Download sebagai file .txt
 
-## Setup & Development
+## Teknologi
 
-### Prerequisites
-- Node.js versi 16 atau lebih tinggi
-- npm atau yarn
+- React + TypeScript
+- Vite
+- Tailwind CSS
+- Lucide Icons
 
-### Installation
+## Install & Run
+
 ```bash
 npm install
-```
-
-### Development Server
-```bash
 npm run dev
 ```
-Aplikasi akan berjalan di `http://localhost:5173`
 
-### Build Production
+## Build Production
+
 ```bash
 npm run build
 ```
-Output tersimpan di folder `dist/`
 
-### Type Checking
-```bash
-npm run typecheck
-```
+Hasil build ada di folder `dist/`.
 
-### Linting
-```bash
-npm run lint
-```
+## Deploy
 
-## Tech Stack
+Bisa dideploy di:
+- Vercel
+- Netlify
+- GitHub Pages
+- Atau hosting static lainnya
 
-- **Framework**: React 18 dengan TypeScript
-- **Build Tool**: Vite
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **State Management**: React Hooks (useState, useEffect)
-- **Storage**: Browser localStorage API
+---
 
-## License
-
-MIT License - silakan gunakan untuk project personal maupun komersial.
+Dibuat oleh Iqra
