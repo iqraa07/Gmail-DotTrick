@@ -1,14 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Copy, Mail, CheckCircle2, List, Download, RotateCcw, History, Save, Moon, Sun, Eye, X, HelpCircle } from 'lucide-react';
+import { Copy, Mail, CheckCircle2, List, Download, RotateCcw, History, Save, Moon, Sun, Eye, X, HelpCircle, Github, Facebook } from 'lucide-react';
 
 type Mode = 'single' | 'bulk';
 
 interface Template {
   name: string;
   usePlus: boolean;
+  plusMode: 'number' | 'letter' | 'combo';
+  plusLetterCount: number;
   useDot: boolean;
   useUppercase: boolean;
   useLowercase: boolean;
+  useDomainRandom: boolean;
 }
 
 function App() {
@@ -23,9 +26,12 @@ function App() {
   const [copied, setCopied] = useState(false);
 
   const [usePlus, setUsePlus] = useState(true);
+  const [plusMode, setPlusMode] = useState<'number' | 'letter' | 'combo'>('number');
+  const [plusLetterCount, setPlusLetterCount] = useState(20);
   const [useDot, setUseDot] = useState(false);
   const [useUppercase, setUseUppercase] = useState(false);
   const [useLowercase, setUseLowercase] = useState(false);
+  const [useDomainRandom, setUseDomainRandom] = useState(false);
 
   const [history, setHistory] = useState<string[]>([]);
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -97,6 +103,18 @@ function App() {
     localStorage.setItem('emailHistory', JSON.stringify(newHistory));
   };
 
+  const generateRandomString = (length: number, includeNumbers: boolean = false): string => {
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      if (includeNumbers && Math.random() > 0.5) {
+        result += Math.floor(Math.random() * 10);
+      } else {
+        result += String.fromCharCode(97 + Math.floor(Math.random() * 26));
+      }
+    }
+    return result;
+  };
+
   const applyTricks = (username: string, num: number): string => {
     let result = username;
 
@@ -113,7 +131,25 @@ function App() {
     }
 
     if (usePlus) {
-      result = `${result}+${num}`;
+      if (plusMode === 'letter') {
+        const randomLetters = generateRandomString(plusLetterCount, false);
+        result = `${result}+${randomLetters}`;
+      } else if (plusMode === 'combo') {
+        const randomCombo = generateRandomString(plusLetterCount, true);
+        result = `${result}+${randomCombo}`;
+      } else {
+        result = `${result}+${num}`;
+      }
+    }
+
+    return result;
+  };
+
+  const applyDomainTricks = (domainName: string): string => {
+    let result = domainName;
+
+    if (useDomainRandom) {
+      result = randomizeCase(result);
     }
 
     return result;
@@ -125,7 +161,8 @@ function App() {
     setEmailError('');
     const username = baseInput.split('@')[0] || baseInput;
     const processedUsername = applyTricks(username, counter);
-    const newEmail = `${processedUsername}@${domain}`;
+    const processedDomain = applyDomainTricks(domain);
+    const newEmail = `${processedUsername}@${processedDomain}`;
 
     if (!validateEmail(newEmail)) {
       setEmailError('Format email tidak valid');
@@ -151,7 +188,8 @@ function App() {
     for (let i = 0; i < bulkCount; i++) {
       const num = bulkStart + i;
       const processedUsername = applyTricks(username, num);
-      const email = `${processedUsername}@${domain}`;
+      const processedDomain = applyDomainTricks(domain);
+      const email = `${processedUsername}@${processedDomain}`;
 
       if (!validateEmail(email)) {
         setEmailError('Format email tidak valid');
@@ -176,7 +214,8 @@ function App() {
     for (let i = 0; i < previewCount; i++) {
       const num = bulkStart + i;
       const processedUsername = applyTricks(username, num);
-      const email = `${processedUsername}@${domain}`;
+      const processedDomain = applyDomainTricks(domain);
+      const email = `${processedUsername}@${processedDomain}`;
 
       if (!validateEmail(email)) {
         setEmailError('Format email tidak valid');
@@ -220,9 +259,12 @@ function App() {
     const newTemplate: Template = {
       name: templateName,
       usePlus,
+      plusMode,
+      plusLetterCount,
       useDot,
       useUppercase,
       useLowercase,
+      useDomainRandom,
     };
 
     const updatedTemplates = [...templates, newTemplate];
@@ -234,9 +276,12 @@ function App() {
 
   const loadTemplate = (template: Template) => {
     setUsePlus(template.usePlus);
+    setPlusMode(template.plusMode || 'number');
+    setPlusLetterCount(template.plusLetterCount || 20);
     setUseDot(template.useDot);
     setUseUppercase(template.useUppercase);
     setUseLowercase(template.useLowercase);
+    setUseDomainRandom(template.useDomainRandom || false);
   };
 
   const deleteTemplate = (index: number) => {
@@ -256,7 +301,7 @@ function App() {
     }
   };
 
-  const toggleTrick = (trick: 'plus' | 'dot' | 'uppercase' | 'lowercase') => {
+  const toggleTrick = (trick: 'plus' | 'dot' | 'uppercase' | 'lowercase' | 'domainRandom') => {
     switch (trick) {
       case 'plus':
         setUsePlus(!usePlus);
@@ -270,34 +315,59 @@ function App() {
       case 'lowercase':
         setUseLowercase(!useLowercase);
         break;
+      case 'domainRandom':
+        setUseDomainRandom(!useDomainRandom);
+        break;
     }
   };
 
   return (
     <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'bg-slate-900' : 'bg-gradient-to-br from-slate-50 to-slate-100'} p-3 sm:p-4 md:p-6`}>
       <div className="max-w-4xl mx-auto py-4 sm:py-6 md:py-8">
-        <div className="flex justify-end mb-4 gap-2">
-          <button
-            onClick={() => setShowHelp(!showHelp)}
-            className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : 'bg-white text-slate-700 hover:bg-slate-100'} shadow-md`}
-            title="Cara Pakai"
-          >
-            <HelpCircle className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : 'bg-white text-slate-700 hover:bg-slate-100'} shadow-md`}
-            title="History"
-          >
-            <History className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setDarkMode(!darkMode)}
-            className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-slate-800 text-yellow-400 hover:bg-slate-700' : 'bg-white text-slate-700 hover:bg-slate-100'} shadow-md`}
-            title="Toggle Dark Mode"
-          >
-            {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          </button>
+        <div className="flex justify-between items-center mb-4 gap-2">
+          <div className="flex items-center gap-2">
+            <a
+              href="https://www.facebook.com/iqraa07"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-slate-800 hover:bg-slate-700 text-blue-400' : 'bg-white hover:bg-slate-100 text-blue-600'} shadow-md`}
+              title="Facebook - Iqra"
+            >
+              <Facebook className="w-5 h-5" />
+            </a>
+            <a
+              href="https://github.com/iqraa07"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-slate-800 hover:bg-slate-700 text-slate-300' : 'bg-white hover:bg-slate-100 text-slate-700'} shadow-md`}
+              title="GitHub - Iqra"
+            >
+              <Github className="w-5 h-5" />
+            </a>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowHelp(!showHelp)}
+              className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : 'bg-white text-slate-700 hover:bg-slate-100'} shadow-md`}
+              title="Cara Pakai"
+            >
+              <HelpCircle className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-slate-800 text-slate-200 hover:bg-slate-700' : 'bg-white text-slate-700 hover:bg-slate-100'} shadow-md`}
+              title="History"
+            >
+              <History className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2 rounded-lg transition-all ${darkMode ? 'bg-slate-800 text-yellow-400 hover:bg-slate-700' : 'bg-white text-slate-700 hover:bg-slate-100'} shadow-md`}
+              title="Toggle Dark Mode"
+            >
+              {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         {showHelp && (
@@ -329,20 +399,45 @@ function App() {
                   <span className="bg-green-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs">2</span>
                   Metode Email
                 </h4>
-                <div className="ml-7 space-y-2">
+                <div className="ml-7 space-y-3">
                   <div>
-                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>Plus (+)</p>
-                    <p className="text-xs">Contoh: namaanda+1@gmail.com, namaanda+2@gmail.com</p>
-                    <p className={`text-xs italic ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Semua masuk ke inbox yang sama</p>
+                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>Plus (+) - 3 MODE BERBEDA!</p>
+                    <div className="ml-3 mt-1 space-y-1">
+                      <p className="text-xs"><strong>Mode Angka:</strong> namaanda+1@gmail.com, namaanda+2@gmail.com</p>
+                      <p className="text-xs"><strong>Mode Huruf:</strong> namaanda+kdjsalwoxmnv@gmail.com (random 5-50 karakter)</p>
+                      <p className="text-xs"><strong>Mode Campur:</strong> namaanda+k8j3s9a2l4w7@gmail.com (huruf + angka random)</p>
+                    </div>
+                    <div className={`p-2 rounded mt-2 ${darkMode ? 'bg-slate-600' : 'bg-green-100'}`}>
+                      <p className="text-xs"><strong>Cara Pakai:</strong></p>
+                      <ol className="list-decimal ml-4 text-xs space-y-0.5 mt-1">
+                        <li>Aktifkan tombol "Plus (+)"</li>
+                        <li>Pilih mode: Angka / Huruf / Campur</li>
+                        <li>Jika pilih Huruf/Campur, atur panjang karakter (5-50) pakai slider</li>
+                        <li>Default: 20 karakter</li>
+                      </ol>
+                      <p className={`text-xs italic mt-1 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>💡 Semua email masuk ke inbox yang sama!</p>
+                    </div>
                   </div>
                   <div>
                     <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>Titik (.)</p>
-                    <p className="text-xs">Contoh: nama.anda@gmail.com, n.amaanda@gmail.com</p>
+                    <p className="text-xs">Sisipkan titik random di username</p>
+                    <p className="text-xs">Contoh: nama.anda@gmail.com, n.ama.anda@gmail.com</p>
                     <p className={`text-xs italic ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Gmail anggap semua sama</p>
                   </div>
                   <div>
-                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>UPPERCASE / lowercase</p>
+                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>UPPERCASE / lowercase (Username)</p>
                     <p className="text-xs">Ubah huruf besar/kecil di username</p>
+                    <p className="text-xs"><strong>Tips:</strong> Aktifkan KEDUANYA untuk random case (CoNtOh@gmail.com)</p>
+                  </div>
+                  <div>
+                    <p className={`font-semibold text-xs ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>Random Case (Domain)</p>
+                    <p className="text-xs">Random huruf besar/kecil di domain (setelah @)</p>
+                    <p className="text-xs">Contoh: namaanda@GmAiL.cOm, namaanda@gMAIl.Com</p>
+                  </div>
+                  <div className={`p-2 rounded ${darkMode ? 'bg-slate-600' : 'bg-green-100'}`}>
+                    <p className={`text-xs font-semibold ${darkMode ? 'text-green-300' : 'text-green-800'}`}>Kombinasi Maksimal:</p>
+                    <p className="text-xs mt-1">CON.TOH+k8j3s9a2@GmAiL.cOm</p>
+                    <p className="text-xs">(Plus Campur + Dot + UPPERCASE + Random Domain)</p>
                   </div>
                 </div>
               </div>
@@ -374,19 +469,28 @@ function App() {
                   <div>
                     <p className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>Simpan Template:</p>
                     <ol className="list-decimal ml-4 space-y-1">
-                      <li>Pilih kombinasi metode yang diinginkan (Plus, Dot, dll)</li>
+                      <li>Pilih kombinasi metode (Plus, Dot, dll)</li>
+                      <li><strong>Atur Plus Mode</strong> (Angka/Huruf/Campur) dan panjang karakter</li>
                       <li>Klik tombol <strong>"Simpan Template"</strong> di bawah label metode</li>
-                      <li>Masukkan nama template (misal: "Plus+Dot")</li>
+                      <li>Masukkan nama template (misal: "Max Security", "Testing Mode")</li>
                       <li>Klik <strong>Simpan</strong></li>
                     </ol>
                   </div>
                   <div>
                     <p className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>Pakai Template:</p>
-                    <p>Klik nama template yang sudah disimpan untuk otomatis load kombinasi metode tersebut.</p>
+                    <p>Klik nama template untuk auto-load SEMUA pengaturan (metode, Plus mode, panjang karakter).</p>
                   </div>
                   <div>
                     <p className={`font-semibold ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>Hapus Template:</p>
                     <p>Klik tombol <strong>X</strong> di sebelah nama template.</p>
+                  </div>
+                  <div className={`p-2 rounded mt-2 ${darkMode ? 'bg-slate-600' : 'bg-orange-100'}`}>
+                    <p className={`text-xs font-semibold ${darkMode ? 'text-orange-300' : 'text-orange-800'}`}>💡 Template menyimpan:</p>
+                    <ul className="list-disc ml-4 mt-1 space-y-0.5">
+                      <li>Metode aktif (Plus, Dot, Uppercase, dll)</li>
+                      <li>Plus Mode (Angka/Huruf/Campur)</li>
+                      <li>Panjang karakter (5-50)</li>
+                    </ul>
                   </div>
                   <div className={`p-2 rounded mt-2 ${darkMode ? 'bg-slate-600' : 'bg-orange-100'}`}>
                     <p className={`text-xs font-semibold ${darkMode ? 'text-orange-300' : 'text-orange-800'}`}>Catatan Penting:</p>
@@ -593,49 +697,130 @@ function App() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => toggleTrick('plus')}
-                className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  usePlus
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                }`}
-              >
-                Plus (+)
-              </button>
-              <button
-                onClick={() => toggleTrick('dot')}
-                className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  useDot
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                }`}
-              >
-                Titik (.)
-              </button>
-              <button
-                onClick={() => toggleTrick('uppercase')}
-                className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  useUppercase
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                }`}
-              >
-                UPPERCASE
-              </button>
-              <button
-                onClick={() => toggleTrick('lowercase')}
-                className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
-                  useLowercase
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
-                }`}
-              >
-                lowercase
-              </button>
+            <div className="space-y-3">
+              <div>
+                <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Metode Username:</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => toggleTrick('plus')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      usePlus
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    Plus (+)
+                  </button>
+                  <button
+                    onClick={() => toggleTrick('dot')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useDot
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    Titik (.)
+                  </button>
+                  <button
+                    onClick={() => toggleTrick('uppercase')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useUppercase
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    UPPERCASE
+                  </button>
+                  <button
+                    onClick={() => toggleTrick('lowercase')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useLowercase
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    lowercase
+                  </button>
+                </div>
+              </div>
+
+              {usePlus && (
+                <div className="space-y-3">
+                  <div>
+                    <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Mode Plus (+):</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        onClick={() => setPlusMode('number')}
+                        className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                          plusMode === 'number'
+                            ? 'bg-purple-600 text-white shadow-md'
+                            : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                        }`}
+                      >
+                        Angka
+                      </button>
+                      <button
+                        onClick={() => setPlusMode('letter')}
+                        className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                          plusMode === 'letter'
+                            ? 'bg-purple-600 text-white shadow-md'
+                            : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                        }`}
+                      >
+                        Huruf
+                      </button>
+                      <button
+                        onClick={() => setPlusMode('combo')}
+                        className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                          plusMode === 'combo'
+                            ? 'bg-purple-600 text-white shadow-md'
+                            : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                        }`}
+                      >
+                        Campur
+                      </button>
+                    </div>
+                  </div>
+
+                  {(plusMode === 'letter' || plusMode === 'combo') && (
+                    <div>
+                      <label className={`text-xs font-medium mb-2 block ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                        Panjang Karakter: {plusLetterCount}
+                      </label>
+                      <input
+                        type="range"
+                        min="5"
+                        max="50"
+                        value={plusLetterCount}
+                        onChange={(e) => setPlusLetterCount(Number(e.target.value))}
+                        className="w-full h-2 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                      />
+                      <div className={`flex justify-between text-xs mt-1 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                        <span>5</span>
+                        <span>50</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <p className={`text-xs font-medium mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>Metode Domain (setelah @):</p>
+                <div className="grid grid-cols-1 gap-2">
+                  <button
+                    onClick={() => toggleTrick('domainRandom')}
+                    className={`px-3 sm:px-4 py-2 sm:py-3 rounded-lg font-medium transition-all text-xs sm:text-sm ${
+                      useDomainRandom
+                        ? 'bg-green-600 text-white shadow-md'
+                        : `${darkMode ? 'bg-slate-700 text-slate-300 hover:bg-slate-600' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`
+                    }`}
+                  >
+                    Random Case (gMaIl.CoM)
+                  </button>
+                </div>
+              </div>
             </div>
-            <p className={`text-xs mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu.</p>
+            <p className={`text-xs mt-2 ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>Tekan untuk aktifkan/nonaktifkan. Bisa pilih lebih dari satu di setiap bagian.</p>
           </div>
 
           {mode === 'single' ? (
@@ -795,9 +980,6 @@ function App() {
         </div>
 
 
-        <div className={`mt-3 sm:mt-4 text-center text-xs sm:text-sm ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-          <p>Dibuat oleh Iqra</p>
-        </div>
       </div>
     </div>
   );
