@@ -252,23 +252,6 @@ vercel
 - Generate 100,000 email: ~2 detik
 - Generate 1,000,000 email: ~20 detik
 
-## Roadmap
-
-- [ ] Export ke CSV format
-- [ ] Custom domain support
-- [ ] Batch import dari file
-- [ ] Cloud sync dengan Supabase
-- [ ] Email verification checker
-- [ ] Chrome extension
-
 ## License
 
 MIT License - silakan gunakan untuk project personal maupun komersial.
-
-## Contributing
-
-Pull requests are welcome! Untuk perubahan major, buka issue terlebih dahulu untuk diskusi.
-
----
-
-**Dibuat oleh [Iqra](https://github.com/iqraa07)** | Dikembangkan dengan fokus pada UX dan performa optimal
